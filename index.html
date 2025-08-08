@@ -586,6 +586,29 @@
       carCtx.arc(carX + 80, carY + 95, 8, 0, Math.PI * 2);
       carCtx.fill();
       
+      // Pfeile zu den Personen
+      // Pfeil zu Tabea (links)
+      carCtx.strokeStyle = '#ef4444';
+      carCtx.lineWidth = 3;
+      carCtx.setLineDash([]);
+      carCtx.beginPath();
+      carCtx.moveTo(carX + 40, carY + 85);
+      carCtx.lineTo(carX + 40, carY + 70);
+      carCtx.lineTo(carX + 35, carY + 75);
+      carCtx.moveTo(carX + 40, carY + 70);
+      carCtx.lineTo(carX + 45, carY + 75);
+      carCtx.stroke();
+      
+      // Pfeil zu Manuel (rechts)
+      carCtx.strokeStyle = '#3b82f6';
+      carCtx.beginPath();
+      carCtx.moveTo(carX + 80, carY + 85);
+      carCtx.lineTo(carX + 80, carY + 70);
+      carCtx.lineTo(carX + 75, carY + 75);
+      carCtx.moveTo(carX + 80, carY + 70);
+      carCtx.lineTo(carX + 85, carY + 75);
+      carCtx.stroke();
+      
       // Feuerwerk aus dem Auto schießen (alle 2 Sekunden)
       if (Math.random() < 0.02) { // 2% Chance pro Frame
         createFirework(carX + 60, carY + 90); // Aus der Mitte des Autos
