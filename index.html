@@ -404,6 +404,10 @@
     let carCanvas, carCtx, carAnimationId;
     let carX = -200;
     let carY = 0;
+    
+    // Feuerwerk-Animation
+    let fireworks = [];
+    let fireworkAnimationId;
 
     function initializeCanvas() {
       canvas = document.getElementById('confetti');
@@ -459,6 +463,60 @@
         ctx.restore();
       });
       animationId = requestAnimationFrame(drawConfetti);
+    }
+
+    function createFirework(x, y) {
+      const particles = [];
+      const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ff8800', '#8800ff'];
+      
+      for (let i = 0; i < 20; i++) {
+        const angle = (Math.PI * 2 * i) / 20;
+        const speed = random(3, 8);
+        particles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          color: colors[Math.floor(random(0, colors.length))],
+          life: 100,
+          maxLife: 100
+        });
+      }
+      
+      fireworks.push({
+        particles: particles,
+        x: x,
+        y: y
+      });
+    }
+
+    function drawFireworks() {
+      fireworks.forEach((firework, index) => {
+        firework.particles.forEach(particle => {
+          // Partikel bewegen
+          particle.x += particle.vx;
+          particle.y += particle.vy;
+          particle.vy += 0.1; // Schwerkraft
+          particle.life--;
+          
+          // Partikel zeichnen
+          if (particle.life > 0) {
+            const alpha = particle.life / particle.maxLife;
+            carCtx.globalAlpha = alpha;
+            carCtx.fillStyle = particle.color;
+            carCtx.beginPath();
+            carCtx.arc(particle.x, particle.y, 3, 0, Math.PI * 2);
+            carCtx.fill();
+          }
+        });
+        
+        // Feuerwerk entfernen wenn alle Partikel tot sind
+        if (firework.particles.every(p => p.life <= 0)) {
+          fireworks.splice(index, 1);
+        }
+      });
+      
+      carCtx.globalAlpha = 1;
     }
 
     function drawCar() {
@@ -528,6 +586,14 @@
       carCtx.arc(carX + 80, carY + 95, 8, 0, Math.PI * 2);
       carCtx.fill();
       
+      // Feuerwerk aus dem Auto schießen (alle 2 Sekunden)
+      if (Math.random() < 0.02) { // 2% Chance pro Frame
+        createFirework(carX + 60, carY + 90); // Aus der Mitte des Autos
+      }
+      
+      // Feuerwerk zeichnen
+      drawFireworks();
+      
       // Straße
       carCtx.strokeStyle = '#6b7280';
       carCtx.lineWidth = 2;
@@ -548,6 +614,7 @@
     function celebrate() {
       cancelAnimationFrame(animationId);
       cancelAnimationFrame(carAnimationId);
+      cancelAnimationFrame(fireworkAnimationId);
       createConfetti();
       drawConfetti();
       drawCar();
