@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>2x Spasstag mit übernachten</title>
+  <style>
+    :root {
+      --bg-start: #f8fbff;
+      --bg-end: #f2f7ff;
+      --card-bg: #ffffff;
+      --text: #1f2937;
+      --muted: #4b5563;
+      --accent: #6d28d9;
+      --accent-2: #10b981;
+      --ring: rgba(109, 40, 217, 0.18);
+      --shadow: 0 10px 30px rgba(31, 41, 55, 0.1);
+      --radius: 16px;
+      --maxw: 760px;
+    }
+
+    .password-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+
+    .password-container {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .password-container h1 {
+      margin: 0 0 20px;
+      color: #1f2937;
+      font-size: 24px;
+    }
+
+    .password-container p {
+      margin: 0 0 30px;
+      color: #6b7280;
+      font-size: 16px;
+    }
+
+    .password-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+
+    .password-input:focus {
+      outline: none;
+      border-color: #7c3aed;
+    }
+
+    .password-btn {
+      background: linear-gradient(180deg, #7c3aed, #6d28d9);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .password-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .password-btn:active {
+      transform: translateY(0);
+    }
+
+    .error-message {
+      color: #dc2626;
+      margin-top: 10px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--text);
+      background: radial-gradient(1200px 900px at 20% -10%, #ffffff, transparent 60%),
+                  radial-gradient(1000px 700px at 120% 10%, #eef2ff, transparent 60%),
+                  linear-gradient(180deg, var(--bg-start), var(--bg-end));
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: var(--maxw);
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid #eef2ff;
+      overflow: hidden;
+    }
+
+    .hero {
+      padding: 28px 28px 8px;
+      background:
+        radial-gradient(1200px 400px at -10% 0%, rgba(109, 40, 217, 0.08), transparent 60%),
+        radial-gradient(800px 300px at 110% -10%, rgba(16, 185, 129, 0.08), transparent 60%);
+    }
+
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      background: #f3e8ff;
+      color: #5b21b6;
+      border: 1px solid #ede9fe;
+    }
+
+    h1 {
+      margin: 14px 0 6px;
+      font-size: clamp(28px, 5vw, 42px);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .sub {
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(15px, 2.2vw, 18px);
+    }
+
+    .details {
+      margin: 16px 0 0;
+      padding: 16px;
+      background: #fef7ff;
+      border: 1px solid #f3e8ff;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .details strong {
+      color: #7c3aed;
+    }
+
+    .content {
+      padding: 24px 28px 28px;
+      display: grid;
+      gap: 24px;
+    }
+
+    .section {
+      padding: 18px;
+      border: 1px solid #eef2ff;
+      border-radius: 12px;
+      background: #fafaff;
+    }
+
+    .section h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: -0.01em;
+    }
+
+    .list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    .item {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      align-items: start;
+      gap: 10px;
+      padding: 10px 12px;
+      background: #ffffff;
+      border: 1px solid #eef2ff;
+      border-radius: 10px;
+    }
+
+    .badge {
+      display: inline-grid;
+      place-items: center;
+      height: 28px;
+      width: 28px;
+      border-radius: 8px;
+      background: #f0f9ff;
+      color: #0369a1;
+      font-size: 16px;
+      border: 1px solid #e0f2fe;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      appearance: none;
+      border: 1px solid #e9e5ff;
+      background: white;
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform .05s ease, box-shadow .15s ease, border-color .15s ease;
+      box-shadow: 0 2px 0 rgba(109, 40, 217, 0.08);
+    }
+    .btn:focus-visible { outline: 4px solid var(--ring); outline-offset: 2px; }
+    .btn:hover { border-color: #d9d6ff; }
+    .btn:active { transform: translateY(1px); }
+
+    .btn.primary {
+      background: linear-gradient(180deg, #7c3aed, #6d28d9);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 8px 22px rgba(109, 40, 217, 0.25);
+    }
+    .btn.primary:hover { filter: brightness(1.03); }
+
+    .foot {
+      padding: 16px 28px 24px;
+      color: var(--muted);
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      border-top: 1px dashed #eef2ff;
+    }
+
+    @media print {
+      body { background: white; }
+      .hero, .btn-row, .foot { display: none; }
+      .card { box-shadow: none; border: none; }
+      .section { background: white; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Passwort-Overlay -->
+  <div id="passwordOverlay" class="password-overlay">
+    <div class="password-container">
+      <h1>🎉 Geburtstagsüberraschung</h1>
+      <p>Gib das Passwort ein, um die Überraschung zu sehen!</p>
+      <p><strong>Hinweis:</strong> Unser Datum DDMMYYYY</p>
+      <input type="password" id="passwordInput" class="password-input" placeholder="Passwort eingeben..." onkeypress="handlePasswordKeyPress(event)">
+      <button onclick="checkPassword()" class="password-btn">Entsperren 🔓</button>
+      <div id="errorMessage" class="error-message">Falsches Passwort! Versuche es nochmal.</div>
+    </div>
+  </div>
+
+  <main class="card hidden" role="main" id="mainContent">
+    <header class="hero">
+      <span class="kicker">🎉 Geburtstags­überraschung</span>
+      <h1>2x Spasstag mit übernachten</h1>
+      <p class="sub">Pack alles Wichtige ein – dann heißt's: abschalten, genießen und ganz viel Spaß haben!</p>
+      
+      <div class="details">
+        <strong>📅 Termin:</strong> 17. - 18. August<br>
+        <strong>🚀 Start:</strong> 15:00 Uhr<br>
+        <strong>🍽️ Verpflegung:</strong> Leicht verpflegt kommen<br>
+        <strong>🚗 Abholung:</strong> Auf Wunsch in Schule Schenkon<br>
+        <strong>🏠 Rückkehr:</strong> 18. August am Abend
+      </div>
+    </header>
+
+    <section class="content" aria-labelledby="packliste">
+      <div class="section">
+        <h2 id="packliste">Packliste</h2>
+        <ul class="list">
+          <li class="item">
+            <span class="badge">🛁</span>
+            <div>Kulturbeutel: Shampoo, Duschgel, Deo, Bürste, Pflege</div>
+          </li>
+          <li class="item">
+            <span class="badge">🛌</span>
+            <div>Schlafsachen & bequeme Kleidung für 2 Tage</div>
+          </li>
+          <li class="item">
+            <span class="badge">👟</span>
+            <div>Bequeme Schuhe und ggf. Wechselkleidung</div>
+          </li>
+          <li class="item">
+            <span class="badge">🔌</span>
+            <div>Ladegerät für Handy und Kopfhörer</div>
+          </li>
+          <li class="item">
+            <span class="badge">🥤</span>
+            <div>Wasserflasche und Snacks für 3 Stunden Autofahrt für den Fahrer</div>
+          </li>
+          <li class="item">
+            <span class="badge">🎨</span>
+            <div>Stempel und Bastelmaterial</div>
+          </li>
+          <li class="item">
+            <span class="badge">😊</span>
+            <div>Gute Laune</div>
+          </li>
+          <li class="item">
+            <span class="badge">💪</span>
+            <div>Knack-Arsch</div>
+          </li>
+          <li class="item">
+            <span class="badge">💰</span>
+            <div>5.- für Kiosk</div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn primary" onclick="celebrate()">Ich bin bereit! 🎊</button>
+        <button class="btn" onclick="window.print()">Packliste drucken 🖨️</button>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span>Alles organisiert – du musst nur noch packen.</span>
+      <span>Viel Spaß! ✨</span>
+    </footer>
+  </main>
+
+  <canvas id="confetti" aria-hidden="true" style="position:fixed; inset:0; pointer-events:none;"></canvas>
+  <canvas id="car" aria-hidden="true" style="position:fixed; inset:0; pointer-events:none;"></canvas>
+
+  <script>
+    // Passwort-Funktionen
+    function checkPassword() {
+      const password = document.getElementById('passwordInput').value;
+      const correctPassword = '08102012';
+      
+      if (password === correctPassword) {
+        document.getElementById('passwordOverlay').classList.add('hidden');
+        document.getElementById('mainContent').classList.remove('hidden');
+        // Canvas initialisieren nach dem Entsperren
+        initializeCanvas();
+      } else {
+        document.getElementById('errorMessage').style.display = 'block';
+        document.getElementById('passwordInput').value = '';
+        document.getElementById('passwordInput').focus();
+      }
+    }
+
+    function handlePasswordKeyPress(event) {
+      if (event.key === 'Enter') {
+        checkPassword();
+      }
+    }
+
+    // Mini-Konfetti
+    let canvas, ctx, confettiPieces = [], animationId;
+
+    // Auto-Animation
+    let carCanvas, carCtx, carAnimationId;
+    let carX = -200;
+    let carY = 0;
+
+    function initializeCanvas() {
+      canvas = document.getElementById('confetti');
+      ctx = canvas.getContext('2d');
+      carCanvas = document.getElementById('car');
+      carCtx = carCanvas.getContext('2d');
+      
+      resizeCanvas();
+    }
+
+    function resizeCanvas() {
+      if (canvas && carCanvas) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        carCanvas.width = window.innerWidth;
+        carCanvas.height = window.innerHeight;
+      }
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    function random(min, max) { return Math.random() * (max - min) + min; }
+
+    function createConfetti(count = 120) {
+      confettiPieces = Array.from({ length: count }, () => ({
+        x: random(0, canvas.width),
+        y: random(-canvas.height, 0),
+        size: random(6, 10),
+        color: ['#7c3aed','#6d28d9','#10b981','#22c55e','#f59e0b','#ef4444'][Math.floor(random(0,6))],
+        vx: random(-1, 1),
+        vy: random(2, 4),
+        rot: random(0, Math.PI * 2),
+        vr: random(-0.1, 0.1)
+      }));
+    }
+
+    function drawConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confettiPieces.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vr;
+
+        if (p.y > canvas.height + 20) {
+          p.y = random(-80, -20);
+          p.x = random(0, canvas.width);
+        }
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+        ctx.restore();
+      });
+      animationId = requestAnimationFrame(drawConfetti);
+    }
+
+    function drawCar() {
+      carCtx.clearRect(0, 0, carCanvas.width, carCanvas.height);
+      
+      // Schweizer Flagge (links)
+      const chFlagX = 50;
+      const chFlagY = carY + 50;
+      const chFlagSize = 40;
+      
+      // Schweizer Flagge - rot
+      carCtx.fillStyle = '#ff0000';
+      carCtx.fillRect(chFlagX, chFlagY, chFlagSize, chFlagSize);
+      
+      // Schweizer Kreuz - weiß
+      carCtx.fillStyle = '#ffffff';
+      // Vertikaler Balken
+      carCtx.fillRect(chFlagX + chFlagSize * 0.4, chFlagY + chFlagSize * 0.2, chFlagSize * 0.2, chFlagSize * 0.6);
+      // Horizontaler Balken
+      carCtx.fillRect(chFlagX + chFlagSize * 0.2, chFlagY + chFlagSize * 0.4, chFlagSize * 0.6, chFlagSize * 0.2);
+      
+      // Deutsche Flagge (rechts)
+      const flagWidth = 60;
+      const flagHeight = 40;
+      const flagX = carCanvas.width - 110;
+      const flagY = carY + 50;
+      
+      // Deutsche Flagge - schwarz
+      carCtx.fillStyle = '#000000';
+      carCtx.fillRect(flagX, flagY, flagWidth, flagHeight / 3);
+      // Deutsche Flagge - rot
+      carCtx.fillStyle = '#dd0000';
+      carCtx.fillRect(flagX, flagY + flagHeight / 3, flagWidth, flagHeight / 3);
+      // Deutsche Flagge - gold
+      carCtx.fillStyle = '#ffce00';
+      carCtx.fillRect(flagX, flagY + 2 * flagHeight / 3, flagWidth, flagHeight / 3);
+      
+      // Auto-Körper (rot)
+      carCtx.fillStyle = '#dc2626';
+      carCtx.fillRect(carX, carY + 100, 120, 40);
+      carCtx.fillRect(carX + 20, carY + 80, 80, 40);
+      
+      // Fenster (hellblau)
+      carCtx.fillStyle = '#93c5fd';
+      carCtx.fillRect(carX + 25, carY + 85, 30, 25);
+      carCtx.fillRect(carX + 65, carY + 85, 30, 25);
+      
+      // Räder (schwarz)
+      carCtx.fillStyle = '#1f2937';
+      carCtx.beginPath();
+      carCtx.arc(carX + 30, carY + 140, 15, 0, Math.PI * 2);
+      carCtx.fill();
+      carCtx.beginPath();
+      carCtx.arc(carX + 90, carY + 140, 15, 0, Math.PI * 2);
+      carCtx.fill();
+      
+      // Scheinwerfer (gelb)
+      carCtx.fillStyle = '#fbbf24';
+      carCtx.fillRect(carX + 110, carY + 105, 8, 8);
+      
+      // Personen (Köpfe)
+      carCtx.fillStyle = '#fbbf24';
+      carCtx.beginPath();
+      carCtx.arc(carX + 40, carY + 95, 8, 0, Math.PI * 2);
+      carCtx.fill();
+      carCtx.beginPath();
+      carCtx.arc(carX + 80, carY + 95, 8, 0, Math.PI * 2);
+      carCtx.fill();
+      
+      // Straße
+      carCtx.strokeStyle = '#6b7280';
+      carCtx.lineWidth = 2;
+      carCtx.setLineDash([20, 20]);
+      carCtx.beginPath();
+      carCtx.moveTo(0, carY + 160);
+      carCtx.lineTo(carCanvas.width, carY + 160);
+      carCtx.stroke();
+      
+      carX += 3;
+      if (carX > carCanvas.width + 200) {
+        carX = -200;
+      }
+      
+      carAnimationId = requestAnimationFrame(drawCar);
+    }
+
+    function celebrate() {
+      cancelAnimationFrame(animationId);
+      cancelAnimationFrame(carAnimationId);
+      createConfetti();
+      drawConfetti();
+      drawCar();
+    }
+  </script>
+</body>
+</html>
