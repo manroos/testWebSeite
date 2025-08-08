@@ -599,6 +599,12 @@
       carCtx.lineTo(carX + 45, carY + 75);
       carCtx.stroke();
       
+      // Name "Tabea" über dem roten Pfeil
+      carCtx.fillStyle = '#ef4444';
+      carCtx.font = 'bold 14px Arial';
+      carCtx.textAlign = 'center';
+      carCtx.fillText('Tabea', carX + 40, carY + 60);
+      
       // Pfeil zu Manuel (rechts)
       carCtx.strokeStyle = '#3b82f6';
       carCtx.beginPath();
@@ -608,6 +614,12 @@
       carCtx.moveTo(carX + 80, carY + 70);
       carCtx.lineTo(carX + 85, carY + 75);
       carCtx.stroke();
+      
+      // Name "Manuel" über dem blauen Pfeil
+      carCtx.fillStyle = '#3b82f6';
+      carCtx.font = 'bold 14px Arial';
+      carCtx.textAlign = 'center';
+      carCtx.fillText('Manuel', carX + 80, carY + 60);
       
       // Feuerwerk aus dem Auto schießen (alle 2 Sekunden)
       if (Math.random() < 0.02) { // 2% Chance pro Frame
